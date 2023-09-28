@@ -1,14 +1,14 @@
 import { randomUUID } from "crypto"
 import { sql } from './db.js'
 
-export class DatabaseMemory {
+export class DatabasePostgres {
     async list(search) {
         let videos
 
         if (search) {
-            videos = await sql`select * from videos where title ilike "%${search}%"`
+            videos = await sql`select * from videos where title ilike ${'%'+search+'%'}`
         } else {
-            videos = await sql`select * from videos"`
+            videos = await sql`select * from videos`
         }
 
         return videos
@@ -24,10 +24,13 @@ export class DatabaseMemory {
     }
 
     async update(id, video) {
-        
+        const { title, description, duration } = video
+
+        await sql`update videos set title = ${title}, description = ${description}, 
+                  duration = ${duration} WHERE id = ${id}`
     }
 
     async delete(id) {
-        
+        await sql`delete from videos where id = ${id}`
     }
 }
